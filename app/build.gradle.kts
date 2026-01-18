@@ -1,3 +1,6 @@
+import com.android.build.api.dsl.Packaging
+import org.gradle.internal.impldep.org.junit.experimental.categories.Categories.CategoryFilter.exclude
+
 plugins {
     alias(libs.plugins.android.application)
 }
