@@ -5,7 +5,7 @@ include(FetchContent)
 
 # FFTW3 build options — must be set before FetchContent_MakeAvailable
 set(DISABLE_FORTRAN   ON  CACHE BOOL "" FORCE)  # no Fortran compiler in NDK
-set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)  # static lib, simpler for Android
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
 set(BUILD_TESTS       OFF CACHE BOOL "" FORCE)
 set(ENABLE_THREADS    OFF CACHE BOOL "" FORCE)
 set(ENABLE_OPENMP     OFF CACHE BOOL "" FORCE)

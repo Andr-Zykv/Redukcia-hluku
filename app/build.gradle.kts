@@ -43,11 +43,7 @@ android {
             version = "3.22.1"
         }
     }
-    packagingOptions {
-        jniLibs {
-            useLegacyPackaging = true
-        }
-    }
+    ndkVersion = "27.0.12077973"
 }
 
 dependencies {
@@ -56,7 +52,6 @@ dependencies {
     implementation(libs.material)
     implementation(libs.activity)
     implementation(libs.constraintlayout)
-    implementation(libs.play.services.ads)
     implementation(libs.play.services.maps)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)

@@ -7,6 +7,7 @@ import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -21,12 +22,14 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
+    private Button toggleRecording;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
+        toggleRecording = findViewById(R.id.MainButton);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
@@ -118,6 +121,8 @@ public class MainActivity extends AppCompatActivity {
         );
 
         isRecording = true;
+        toggleRecording.setOnClickListener(this::stopRecording);
+        toggleRecording.setText("Stop Recording");
         short[] buffer = new short[bufferSize];
 
         recorder.startRecording();
@@ -153,5 +158,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void stopRecording(View view){
         isRecording = false;
+        toggleRecording.setOnClickListener(this::startRecording);
+        toggleRecording.setText("Start Recording");
     }
 }
