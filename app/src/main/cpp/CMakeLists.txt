@@ -24,3 +24,6 @@ find_library(log-lib log)
 # FFTW3's CMake target does not propagate INTERFACE_INCLUDE_DIRECTORIES
 target_include_directories(voiceFilter PRIVATE ${fftw3_SOURCE_DIR}/api)
 target_link_libraries(voiceFilter PRIVATE ${log-lib} fftw3)
+
+# Align ELF LOAD segments to 16 KB so the library works on 16 KB-page devices
+target_link_options(voiceFilter PRIVATE "-Wl,-z,max-page-size=16384")

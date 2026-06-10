@@ -1,6 +1,3 @@
-import com.android.build.api.dsl.Packaging
-import org.gradle.internal.impldep.org.junit.experimental.categories.Categories.CategoryFilter.exclude
-
 plugins {
     alias(libs.plugins.android.application)
 }
@@ -44,6 +41,7 @@ android {
         }
     }
     ndkVersion = "27.0.12077973"
+    buildToolsVersion = "36.0.0"
 }
 
 dependencies {
