@@ -44,6 +44,8 @@ public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_RECORD_AUDIO = 1;
     private static final int SAMPLE_RATE = 44100;
     private static final int FILTER_CHUNK = (int) (0.06 * SAMPLE_RATE);
+    private static final int MAX_RECORDING_SECONDS = 120;
+    private static final long MAX_SAMPLES = (long) SAMPLE_RATE * MAX_RECORDING_SECONDS;
 
     private Button toggleRecording;
     private volatile boolean isRecording = false;
@@ -124,6 +126,7 @@ public class MainActivity extends AppCompatActivity {
 
         recordingThread = new Thread(() -> {
             short[] buffer = new short[audioBufferSize];
+            long[] samplesWritten = {0};
             recorder.startRecording();
             try (FileOutputStream fos = new FileOutputStream(pcmFile)) {
                 while (isRecording) {
@@ -132,12 +135,22 @@ public class MainActivity extends AppCompatActivity {
                         fos.write(buffer[i] & 0xff);
                         fos.write((buffer[i] >> 8) & 0xff);
                     }
+                    samplesWritten[0] += read;
+                    if (samplesWritten[0] >= MAX_SAMPLES) {
+                        isRecording = false;
+                    }
                 }
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {
                 recorder.stop();
                 recorder.release();
+            }
+            if (samplesWritten[0] >= MAX_SAMPLES) {
+                runOnUiThread(() -> {
+                    Toast.makeText(this, "Reached " + MAX_RECORDING_SECONDS + "s limit, stopping", Toast.LENGTH_SHORT).show();
+                    stopRecording(null);
+                });
             }
         });
         recordingThread.start();
