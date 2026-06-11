@@ -196,7 +196,7 @@ public class MainActivity extends AppCompatActivity {
             // Overlap-add with 50% hop and a Hanning window on each chunk
             int hop = FILTER_CHUNK / 2;
             int numChunks = (int) Math.ceil((double) totalSamples / hop);
-            short[] processed = new short[totalSamples];
+            int[] accum = new int[totalSamples];
             int offset = 0;
             for (int c = 0; c < numChunks; c++) {
                 short[] chunk = new short[FILTER_CHUNK];
@@ -211,10 +211,20 @@ public class MainActivity extends AppCompatActivity {
                 for (int i = 0; i < FILTER_CHUNK; i++){
                     int idx = offset + i;
                     if (idx < totalSamples) {
-                        processed[idx] += out[i];
+                        accum[idx] += out[i];
                     }
                 }
                 offset += hop;
+            }
+
+            int peak = 0;
+            for (int v : accum) {
+                peak = Math.max(peak, Math.abs(v));
+            }
+            double gain = peak > 0 ? (0.9 * 32767.0) / peak : 1.0;
+            short[] processed = new short[totalSamples];
+            for (int i = 0; i < totalSamples; i++) {
+                processed[i] = (short) Math.round(accum[i] * gain);
             }
 
             try {
