@@ -1,5 +1,8 @@
 package com.example.noisecancellation;
 
+import static java.lang.Math.PI;
+import static java.lang.Math.cos;
+
 import android.Manifest;
 import android.content.ContentResolver;
 import android.content.ContentValues;
@@ -177,16 +180,28 @@ public class MainActivity extends AppCompatActivity {
                 audio[i] = (short) ((bytes[2 * i] & 0xFF) | ((bytes[2 * i + 1] & 0xFF) << 8));
             }
 
-            // Feed FILTER_CHUNK samples at a time; zero-pad the last partial chunk
-            int numChunks = (totalSamples + FILTER_CHUNK - 1) / FILTER_CHUNK;
-            short[] processed = new short[numChunks * FILTER_CHUNK];
+            // Overlap-add with 50% hop and a Hanning window on each chunk
+            int hop = FILTER_CHUNK / 2;
+            int numChunks = (int) Math.ceil((double) totalSamples / hop);
+            short[] processed = new short[totalSamples];
+            int offset = 0;
             for (int c = 0; c < numChunks; c++) {
-                int offset = c * FILTER_CHUNK;
                 short[] chunk = new short[FILTER_CHUNK];
-                int toCopy = Math.min(FILTER_CHUNK, totalSamples - offset);
-                System.arraycopy(audio, offset, chunk, 0, toCopy);
+                int toCopy = Math.max(0, Math.min(FILTER_CHUNK, totalSamples - offset));
+                if (toCopy > 0) {
+                    System.arraycopy(audio, offset, chunk, 0, toCopy);
+                }
+                for (int i = 0; i < FILTER_CHUNK; i++){
+                    chunk[i] = (short) (chunk[i] * 0.5 * (1 - cos(2*PI*i / (FILTER_CHUNK))));
+                }
                 short[] out = vf.processAudio(chunk);
-                System.arraycopy(out, 0, processed, offset, FILTER_CHUNK);
+                for (int i = 0; i < FILTER_CHUNK; i++){
+                    int idx = offset + i;
+                    if (idx < totalSamples) {
+                        processed[idx] += out[i];
+                    }
+                }
+                offset += hop;
             }
 
             try {

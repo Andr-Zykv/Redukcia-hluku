@@ -61,9 +61,13 @@ Java_com_example_noisecancellation_VoiceFilter_processAudio(JNIEnv *env, jobject
     // Bandpass: zero bins outside voice range
     const int numBins = g.N / 2 + 1;
     for (int k = 0; k < numBins; k++) {
-        if (k < g.binLow || k > g.binHi) {
-            g.freqBuf[k][0] = 0.0;
-            g.freqBuf[k][1] = 0.0;
+        if (k < g.binLow) {
+            g.freqBuf[k][0] *= 1.0/(g.binLow - k);
+            g.freqBuf[k][1] *= 1.0/(g.binLow - k);
+        }
+        if (k > g.binHi) {
+            g.freqBuf[k][0] *= 1.0/(k - g.binHi);
+            g.freqBuf[k][1] *= 1.0/(k - g.binHi);
         }
     }
 
